@@ -167,7 +167,7 @@ jobs:
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
           compress_format: ${{ inputs.compress_format }}
           silent_log: ${{ inputs.silent_log }}
-          auto_patch: false
+          auto_patch: true
           kernel_patch: false
 
       - name: Upload Kernel to Release
