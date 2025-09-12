@@ -389,8 +389,6 @@ query_version() {
 apply_patch() {
     cd ${current_path}
     echo -e "${STEPS} Start applying custom kernel patches..."
-    ls -l
-    echo `[[ -d "${kernel_patch_path}/${local_kernel_path}" ]]`
 
     # Apply the common kernel patches
     if [[ -d "${kernel_patch_path}/common-kernel-patches" ]]; then
