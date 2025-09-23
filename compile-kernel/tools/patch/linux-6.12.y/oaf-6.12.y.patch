@@ -1,11 +1,13 @@
-From 30cc7b18275e0ab8f99c6558ff60ee2d1ce15a62 Mon Sep 17 00:00:00 2001
+From 62a472d718807cab8ea8b2399765c9daba214d9a Mon Sep 17 00:00:00 2001
 From: laiyj <laiyujun@vip.qq.com>
-Date: Sat, 20 Sep 2025 22:33:32 +0800
+Date: Tue, 23 Sep 2025 11:34:15 +0800
 Subject: [PATCH] Add OpenAppFilter (OAF) driver
 
 ---
  drivers/net/Kconfig                   |    1 +
  drivers/net/Makefile                  |    1 +
+ drivers/net/oaf/Kconfig               |   20 +
+ drivers/net/oaf/Makefile              |    7 +
  drivers/net/oaf/af_client.c           |  658 +++++++++
  drivers/net/oaf/af_client.h           |  105 ++
  drivers/net/oaf/af_client_fs.c        |  295 ++++
@@ -29,7 +31,9 @@ Subject: [PATCH] Add OpenAppFilter (OAF) driver
  drivers/net/oaf/cJSON.c               |  519 +++++++
  drivers/net/oaf/cJSON.h               |   94 ++
  drivers/net/oaf/regexp.c              |  302 ++++
- 25 files changed, 5671 insertions(+)
+ 27 files changed, 5698 insertions(+)
+ create mode 100644 drivers/net/oaf/Kconfig
+ create mode 100644 drivers/net/oaf/Makefile
  create mode 100644 drivers/net/oaf/af_client.c
  create mode 100644 drivers/net/oaf/af_client.h
  create mode 100644 drivers/net/oaf/af_client_fs.c
@@ -55,23 +59,62 @@ Subject: [PATCH] Add OpenAppFilter (OAF) driver
  create mode 100644 drivers/net/oaf/regexp.c
 
 diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index ee96dc11c..a5b95bf3c 100644
+index 9920b3a68..ee96dc11c 100644
 --- a/drivers/net/Kconfig
 +++ b/drivers/net/Kconfig
-@@ -670,3 +670,4 @@ config NETDEV_LEGACY_INIT
+@@ -669,3 +669,4 @@ config NETDEV_LEGACY_INIT
+ 	  symbol, everything else no longer needs it.
 
  endif # NETDEVICES
- source "drivers/net/oaf/Kconfig"
 +source "drivers/net/oaf/Kconfig"
 diff --git a/drivers/net/Makefile b/drivers/net/Makefile
-index 52413643a..e92447869 100644
+index 13743d0e8..52413643a 100644
 --- a/drivers/net/Makefile
 +++ b/drivers/net/Makefile
-@@ -91,3 +91,4 @@ obj-$(CONFIG_USB4_NET) += thunderbolt/
+@@ -90,3 +90,4 @@ obj-$(CONFIG_FUJITSU_ES) += fjes/
+ obj-$(CONFIG_USB4_NET) += thunderbolt/
  obj-$(CONFIG_NETDEVSIM) += netdevsim/
  obj-$(CONFIG_NET_FAILOVER) += net_failover.o
- obj-$(CONFIG_OPENAPPFILTER) += oaf/
 +obj-$(CONFIG_OPENAPPFILTER) += oaf/
+diff --git a/drivers/net/oaf/Kconfig b/drivers/net/oaf/Kconfig
+new file mode 100644
+index 000000000..e94213e8a
+--- /dev/null
++++ b/drivers/net/oaf/Kconfig
+@@ -0,0 +1,20 @@
++#
++# Open Application Filter configuration
++#
++
++config OPENAPPFILTER
++	tristate "Open Application Filter support"
++	depends on NET
++	depends on NETFILTER
++	depends on NETFILTER_ADVANCED
++	depends on NF_CONNTRACK
++	depends on NF_CONNTRACK_MARK
++	depends on NETFILTER_XTABLES
++	default n
++	help
++	  This module adds application identification and filtering capabilities
++	  to the Linux kernel. It can identify applications by their network
++	  behavior and filter them based on user-defined rules.
++
++	  To compile this driver as a module, choose M here. The module
++	  will be called openappfilter.
+diff --git a/drivers/net/oaf/Makefile b/drivers/net/oaf/Makefile
+new file mode 100644
+index 000000000..9fa072b9f
+--- /dev/null
++++ b/drivers/net/oaf/Makefile
+@@ -0,0 +1,7 @@
++#
++# Makefile for Open Application Filter
++#
++
++obj-$(CONFIG_OPENAPPFILTER) += oaf.o
++
++oaf-objs := oaf-objs := app_filter.o af_utils.o  af_config.o regexp.o cJSON.o af_log.o af_client.o af_client_fs.o af_conntrack.o af_rule_config.o af_user_config.o af_whitelist_config.o
 diff --git a/drivers/net/oaf/af_client.c b/drivers/net/oaf/af_client.c
 new file mode 100644
 index 000000000..8f78d4820
@@ -5886,5 +5929,5 @@ index 000000000..6d42d5319
 +	TEST_reg_func(".*baidu.com$", "www.baidu.com223", 0);
 +}
 --
-2.48.1
+2.51.0
 
