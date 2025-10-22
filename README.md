@@ -172,13 +172,13 @@ In the use of Armbian, some common problems that may be encountered can be found
 
 1. Clone the repository to local `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-2. Install the necessary software packages (scripts have only been tested under x86_64 Ubuntu-20.04/22.04)
+2. Install the necessary software packages (for Ubuntu 24.04)
 
 ```shell
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
-# For Ubuntu-22.04
-sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
+# For Ubuntu-24.04
+sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbian-depends)
 ```
 
 3. Enter the `~/amlogic-s9xxx-armbian` root directory, create a `build/output/images` folder in the root directory, and upload the Armbian image file (such as `Armbian_21.11.0-trunk_Odroidn2_current_5.15.50.img`) to `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (such as `21.11.0`) and the kernel version number (such as `5.15.50`) in the original Armbian image file name. It will be used as the name of the Armbian system after restructuring.
